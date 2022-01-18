@@ -1,0 +1,50 @@
+@use 'reset' as *
+main
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  max-width: 35rem
+  border: 2px solid #222
+  border-radius: 4px
+#display
+  position: relative
+  width: 100%
+  height: 7rem
+  padding: 0.5rem
+  border-bottom: 2px solid #222
+  text-align: right
+  & p:nth-child(1)
+    font-size: 3.8rem
+  & p:nth-child(2)
+    font-size: 1.5rem
+  & p:nth-child(3)
+    position: absolute
+    top: 0
+    left: 0
+    color: red
+    font-size: 2rem
+
+#pad
+  display: grid
+  grid-template-columns: repeat(4, minmax(6rem, 1fr))
+  gap: 1rem
+  padding: 1.5rem
+  button
+    padding: 1.5rem 1rem
+    cursor: pointer
+    font-size: 2rem
+    color: #FAFAFA
+    border: 1px solid #222
+    border-radius: 4px
+    background: #777
+    &:hover
+      transform: scale(1.1)
+  #clear, #zero
+    grid-column: 1/3
+  #clear
+    background: red
+  #clearLast
+    background: steelblue
+  #equals
+    background: seagreen

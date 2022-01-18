@@ -1,0 +1,20 @@
+@use 'mixins' as *
+// reset
+html
+  box-sizing: border-box
+  font-size: 62.5%
+  height: 100%
+*, *:before, *:after
+  box-sizing: inherit
+body,
+blockquote,
+figure,
+h1,
+p
+  margin: 0
+body
+  background-color: #f8f8ff
+  font-family: 'Roboto Slab', serif
+  font-size: 1.6rem
+  @include breakpoint(768px)
+    font-size: 2rem
