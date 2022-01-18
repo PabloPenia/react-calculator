@@ -1,0 +1,93 @@
+html {
+  box-sizing: border-box;
+  font-size: 62.5%;
+  height: 100%;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body,
+blockquote,
+figure,
+h1,
+p {
+  margin: 0;
+}
+
+body {
+  background-color: #f8f8ff;
+  font-family: "Roboto Slab", serif;
+  font-size: 1.6rem;
+}
+@media (min-width: 768px) {
+  body {
+    font-size: 2rem;
+  }
+}
+
+main {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 35rem;
+  border: 2px solid #222;
+  border-radius: 4px;
+}
+
+#display {
+  position: relative;
+  width: 100%;
+  height: 7rem;
+  padding: 0.5rem;
+  border-bottom: 2px solid #222;
+  text-align: right;
+}
+#display p:nth-child(1) {
+  font-size: 3.8rem;
+}
+#display p:nth-child(2) {
+  font-size: 1.5rem;
+}
+#display p:nth-child(3) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: red;
+  font-size: 2rem;
+}
+
+#pad {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(6rem, 1fr));
+  gap: 1rem;
+  padding: 1.5rem;
+}
+#pad button {
+  padding: 1.5rem 1rem;
+  cursor: pointer;
+  font-size: 2rem;
+  color: #FAFAFA;
+  border: 1px solid #222;
+  border-radius: 4px;
+  background: #777;
+}
+#pad button:hover {
+  transform: scale(1.1);
+}
+#pad #clear, #pad #zero {
+  grid-column: 1/3;
+}
+#pad #clear {
+  background: red;
+}
+#pad #clearLast {
+  background: steelblue;
+}
+#pad #equals {
+  background: seagreen;
+}
+
+/*# sourceMappingURL=style.css.map */
