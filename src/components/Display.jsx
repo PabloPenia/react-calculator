@@ -3,8 +3,7 @@ const Display = ({ current, formula }) => {
     <div id="display">
       <p>{current}</p>
       <p>
-        {formula}{' '}
-        <span style={{ color: 'red' }}>{current}</span>
+        {formula} <span>{formula.length > 0 && current}</span>
       </p>
     </div>
   )
