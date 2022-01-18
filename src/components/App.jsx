@@ -12,6 +12,7 @@ function App() {
       setCurrentVal('0')
     },
     clearLast: () => {
+      if (typeof currentVal === 'number') return make.clear()
       if (currentVal.length === 1) {
         if (formula.length === 0) {
           return make.clear()
@@ -32,13 +33,12 @@ function App() {
       }
     },
     result: () => {
-      // code after refactor functions.js
-      // setCurrentVal(run.calculate(formula, currentVal))
-      // setFormula('')
+      setCurrentVal(run.calculate(formula, currentVal))
+      setFormula([])
     },
     num: e => {
       const value = e.target.value
-      if (currentVal === '0') return setCurrentVal(value)
+      if (currentVal === '0' || typeof currentVal === 'number') return setCurrentVal(value)
       if (isOp.test(currentVal)) {
         setFormula(run.parseData(formula, currentVal))
         setCurrentVal(value)

@@ -1,13 +1,12 @@
 export const run = {
   isOp: /[x/+-]/,
+  isPrec: /[x/]/,
   calculate: function (arr, value) {
     arr = [...arr]
-    console.log('before parsing: ', arr)
-    this.parseData(arr, value)
-    console.log('Parsed: ', arr)
-    this.evalLastInput(arr)
-    //.filter(item => item !== '+')
-    return console.log('Evaluated: ', arr)
+    arr = this.parseData(arr, value)
+    arr = this.evalLastInput(arr).filter(item => item !== '+')
+    arr = this.makeCalc(arr)
+    return parseFloat(arr.toFixed(4))
   },
   evalLastInput: function (arr) {
     switch (arr.at(-1)) {
@@ -20,9 +19,39 @@ export const run = {
         arr = [...arr, 1]
         break
       default:
-        arr = [...arr]
+        break
     }
-    return this
+    return arr
+  },
+  makeCalc: function (arr) {
+    // find index of first sign x or /
+    let index = arr.findIndex(item => this.isPrec.test(item))
+    if (index > 0) {
+      // index 0 is not possible for make.op logic in App.jsx, if is -1 there's no precedence to calculate.
+      let prev = index - 1
+      let post = index + 1
+      let calc
+      arr[index] === 'x' ? (calc = arr[prev] * arr[post]) : (calc = arr[prev] / arr[post])
+      switch (index) {
+        // recursive switch call itself on every pass:
+        // case 1 and default should run no more than once
+        // case 2 in every pass until there's no more precedence
+        case 1:
+          arr = [calc, ...arr.slice(3)]
+          return this.makeCalc(arr)
+        case 2:
+          arr = [arr[0], calc, ...arr.slice(4)]
+          return this.makeCalc(arr)
+        default:
+          let reduced = arr.slice(0, prev).reduce((a, b) => a + b)
+          arr = [reduced, calc, ...arr.slice(post + 1)]
+          return this.makeCalc(arr)
+      }
+    } else {
+      // no more precedence getting the last result....
+      arr = arr.reduce((a, b) => a + b)
+    }
+    return arr
   },
   parseData: function (arr, value) {
     //numbers
@@ -34,38 +63,6 @@ export const run = {
       }
     }
     //return signs or numbers already parsed
-    arr = [...arr, value]
-    console.log('parsing... ', arr)
-    return arr
+    return (arr = [...arr, value])
   },
 }
-
-/* CODE TO test REFACTOR */
-//Handling precedence and calculating
-// calculate(tempResult)
-// function calculate(arr) {
-//   let index = arr.findIndex(item => isNaN(item))
-//   if (index > 0) {
-//     let prev = index - 1
-//     let post = index + 1
-//     let calc
-//     arr[index] === 'x' ? (calc = prev * post) : (calc = prev / post)
-//     switch (index) {
-//       case 1:
-//         tempResult = [calc, ...tempResult.slice(3)]
-//         calculate(tempResult)
-//         break
-//       case 2:
-//         tempResult = [tempResult[0], calc, ...tempResult.slice(4)]
-//         calculate(tempResult)
-//         break
-//       default:
-//         let reduced = tempResult.slice(0, prev).reduce((a, b) => a + b)
-//         tempResult = [reduced, calc, ...tempResult.slice(4)]
-//         calculate(tempResult)
-//     }
-//   } else {
-//     // setCalculating(false)
-//     console.log(tempResult)
-//   }
-// }
