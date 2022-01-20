@@ -1,14 +1,28 @@
-export const run = {
-  isOp: /[x/+-]/,
-  isPrec: /[x/]/,
+const run = {
+  isOp: /[x/+]$/,
+  isOpOrMinus: /[x/+-]$/,
+  isPrec: /[x/]$/,
   calculate: function (arr, value) {
     arr = [...arr]
+    // adding and evaluating last input, then delete all plus which aren't need it for calculations
     arr = this.parseData(arr, value)
     arr = this.evalLastInput(arr).filter(item => item !== '+')
+    // getting the final result and parsing again
     arr = this.makeCalc(arr)
     return parseFloat(arr.toFixed(4))
   },
+  cleanMinus: function (arr) {
+    let minus = arr.findIndex(item => item === '-')
+    // if find minus, by the logic of the calculator the only possiblity is that next value is a number (positive or negative), just make it opposite and get back to this function until theres no more minus to clean:
+    if (minus > 0) {
+      arr = [...arr.slice(0, minus), -arr[minus + 1], ...arr.slice([minus + 2])]
+      return this.cleanMinus(arr)
+    } else {
+      return arr
+    }
+  },
   evalLastInput: function (arr) {
+    // adding the necessary values if the last input is an operator
     switch (arr.at(-1)) {
       case '+':
       case '-':
@@ -24,6 +38,9 @@ export const run = {
     return arr
   },
   makeCalc: function (arr) {
+    // clean any minus between operators
+    arr = this.cleanMinus(arr)
+    // making calculations of precedence first, then just sum every value
     // find index of first sign x or /
     let index = arr.findIndex(item => this.isPrec.test(item))
     if (index > 0) {
@@ -55,14 +72,11 @@ export const run = {
   },
   parseData: function (arr, value) {
     //numbers
-    if (!this.isOp.test(value)) {
+    if (!this.isOp.test(value) && value !== '-') {
       value = parseFloat(parseFloat(value).toFixed(4))
-      if (arr.at(-1) === '-') {
-        value = -value
-        arr = [...arr.slice(0, -1)]
-      }
     }
     //return signs or numbers already parsed
     return (arr = [...arr, value])
   },
 }
+export default run

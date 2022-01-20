@@ -1,74 +1,76 @@
 import { useState } from 'react'
-import { run } from '../js/functions'
+import run from '../js'
 import Display from './Display'
 import Pad from './Pad'
 function App() {
   const [currentVal, setCurrentVal] = useState('0')
   const [formula, setFormula] = useState([])
+  const initial = currentVal === '0' && formula.length === 0
   const isOp = run.isOp
+  const isOpOrMinus = run.isOpOrMinus
   const make = {
-    clear: () => {
+    reset: value => setCurrentVal(value),
+    result: (prevVal, lastVal) => {
+      setCurrentVal(run.calculate(prevVal, lastVal))
       setFormula([])
-      setCurrentVal('0')
     },
+    update: (prevVal, nextVal) => {
+      setCurrentVal(nextVal)
+      Array.isArray(prevVal) ? setFormula(prevVal) : setFormula(run.parseData(formula, prevVal))
+    },
+  }
+  const handlers = {
+    addDecimal: () => {
+      if (currentVal.includes('.')) return
+      if (currentVal === '-') return make.reset('-0.')
+      isOp.test(currentVal) ? make.update(currentVal, '0.') : make.reset(currentVal + '.')
+    },
+    addMinus: () => {
+      if (currentVal === '-' && (formula.at(-1) === '-' || formula.length === 0)) return
+      if (isOpOrMinus.test(currentVal) && isOpOrMinus.test(formula.at(-1))) return make.reset('-')
+      currentVal === '0' ? make.reset('-') : make.update(currentVal, '-')
+    },
+    addNum: e => {
+      const value = e.target.value
+      if (initial || typeof currentVal === 'number') return make.reset(value)
+      isOp.test(currentVal) ? make.update(currentVal, value) : make.reset(currentVal + value)
+    },
+    addOp: e => {
+      const op = e.target.value
+      if (isOpOrMinus.test(formula.at(-1)) && isOpOrMinus.test(currentVal)) return make.reset(op)
+      switch (op) {
+        case '+':
+          if (currentVal === '+' && (formula.at(-1) === '+' || formula.length === 0)) return
+          initial ? make.reset(op) : make.update(currentVal, op)
+          break
+        default:
+          if (initial) return
+          if (isOp.test(currentVal) && currentVal !== '+') {
+            make.reset(op)
+          } else {
+            make.update(currentVal, op)
+          }
+      }
+    },
+    addResult: () => make.result(formula, currentVal),
+    clear: () => make.update([], '0'),
     clearLast: () => {
-      if (typeof currentVal === 'number') return make.clear()
+      // TODO: refactor this
+      if (typeof currentVal === 'number') return handlers.clear()
       if (currentVal.length === 1) {
         if (formula.length === 0) {
-          return make.clear()
+          return handlers.clear()
         }
-        setCurrentVal(formula.at(-1).toString())
-        setFormula(formula.slice(0, -1))
+        return make.update(formula.slice(0, -1), formula.at(-1).toString())
       } else {
-        setCurrentVal(currentVal.slice(0, -1))
-      }
-    },
-    decimal: () => {
-      if (currentVal.includes('.')) return
-      if (isOp.test(currentVal)) {
-        setFormula(run.parseData(formula, currentVal))
-        return setCurrentVal('0.')
-      } else {
-        return setCurrentVal(currentVal + '.')
-      }
-    },
-    result: () => {
-      setCurrentVal(run.calculate(formula, currentVal))
-      setFormula([])
-    },
-    num: e => {
-      const value = e.target.value
-      if (currentVal === '0' || typeof currentVal === 'number') return setCurrentVal(value)
-      if (isOp.test(currentVal)) {
-        setFormula(run.parseData(formula, currentVal))
-        setCurrentVal(value)
-      } else {
-        setCurrentVal(currentVal + value)
-      }
-    },
-    op: e => {
-      const op = e.target.value
-      if (op === '-') {
-        if (currentVal === '-') {
-          return setCurrentVal('+')
-        } else {
-          setFormula(run.parseData(formula, currentVal))
-          return setCurrentVal(op)
-        }
-      }
-      if (isOp.test(currentVal)) {
-        return setCurrentVal(op)
-      }
-      if (currentVal !== '0') {
-        setFormula(run.parseData(formula, currentVal))
-        setCurrentVal(op)
+        return make.reset(currentVal.slice(0, -1))
       }
     },
   }
   return (
     <main>
       <Display current={currentVal} formula={formula} />
-      <Pad handler={make} />
+      <Pad handler={handlers} />
     </main>
   )
 }
