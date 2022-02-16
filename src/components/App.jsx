@@ -1,3 +1,4 @@
+import '../sass/App.sass'
 import { useState } from 'react'
 import run from '../js'
 import Display from './Display'
@@ -33,6 +34,7 @@ function App() {
     addNum: e => {
       const value = e.target.value
       if (initial || typeof currentVal === 'number') return make.reset(value)
+      if (isOpOrMinus.test(formula.at(-1)) && isOp.test(currentVal)) return make.reset(value)
       isOp.test(currentVal) ? make.update(currentVal, value) : make.reset(currentVal + value)
     },
     addOp: e => {
@@ -68,10 +70,27 @@ function App() {
     },
   }
   return (
-    <main>
-      <Display current={currentVal} formula={formula} />
-      <Pad handler={handlers} />
-    </main>
+    <>
+      <main>
+        <div>
+          <Display current={currentVal} formula={formula} />
+          <Pad handler={handlers} />
+        </div>
+      </main>
+      <footer>
+        <a href="https://reactjs.org" target="_blank" rel="noreferrer">
+          React
+        </a>{' '}
+        Calculator by{' '}
+        <a href="https://linkedin.com/in/PabloPenia" target="_blank" rel="noreferrer">
+          Pablo Peña
+        </a>
+        . | Get the{' '}
+        <a href="https://github.com/PabloPenia/react-calculator.git" target="_blank" rel="noreferrer">
+          Source Code
+        </a>
+      </footer>
+    </>
   )
 }
 
